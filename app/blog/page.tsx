@@ -1,0 +1,60 @@
+import type { Metadata } from "next";
+import { Container } from "@/components/ui/Container";
+import { PostCard } from "@/components/blog/PostCard";
+import { getAllPosts, getAllCategories } from "@/lib/mdx";
+
+// 老王说明：文章列表页
+// 当前版本：直接列出所有文章 + 分类筛选 chip（点击跳转分类页，下个迭代实现）
+export const metadata: Metadata = {
+  title: "博客",
+  description: "工业互联网、AI 应用、全栈工程实践笔记。",
+};
+
+export default function BlogIndexPage() {
+  const posts = getAllPosts();
+  const categories = getAllCategories();
+
+  return (
+    <Container size="wide" className="py-16">
+      {/* 标题区 */}
+      <header className="mb-10">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          <span className="text-gradient-brand">博客</span>
+        </h1>
+        <p className="mt-3 text-muted max-w-2xl">
+          工业互联网实战、AI 应用探索、全栈工程经验，老王边写代码边记录。
+        </p>
+      </header>
+
+      {/* 分类 chip */}
+      {categories.length > 0 && (
+        <div className="mb-10 flex flex-wrap gap-2">
+          <span className="inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-xs font-medium text-white">
+            全部 · {posts.length}
+          </span>
+          {categories.map((cat) => (
+            <span
+              key={cat}
+              className="inline-flex items-center rounded-full border border-border/60 px-3 py-1 text-xs text-muted hover:border-brand/60 hover:text-brand transition-colors cursor-pointer"
+            >
+              {cat}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* 文章列表 */}
+      {posts.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-border p-12 text-center">
+          <p className="text-muted">还没有文章哦，老王正在码字…</p>
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <PostCard key={post.slug} post={post} />
+          ))}
+        </div>
+      )}
+    </Container>
+  );
+}

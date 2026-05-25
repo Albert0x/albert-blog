@@ -2,26 +2,172 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 老王说明：全局变量，亮/暗双模式支持 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 250 250 252;     /* #FAFAFC 近白带冷色 */
+  --foreground: 17 17 32;        /* #111120 深紫黑文字 */
+  --muted: 113 113 142;          /* 灰文字 */
+  --border: 230 230 240;         /* 浅边框 */
+  --card: 255 255 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: 10 10 24;        /* #0A0A18 深紫黑 */
+  --foreground: 240 240 248;
+  --muted: 148 148 178;
+  --border: 38 38 58;
+  --card: 18 18 34;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
+  font-feature-settings: "rlig" 1, "calt" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 滚动条优化（程序员的小细节） */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 @layer utilities {
+  /* 渐变文字 - 标题杀手锏 */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* 毛玻璃容器 */
+  .glass {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+  }
+  .dark .glass {
+    background: rgba(18, 18, 34, 0.6);
+  }
+
+  /* 卡片悬浮 - 给项目和文章卡片用 */
+  .card-hover {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .card-hover:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.25);
+  }
+
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* 老王说明：rehype-pretty-code 代码块样式 */
+/* 双主题：浅色用 github-light，深色由 .dark 类切换 */
+[data-rehype-pretty-code-figure] {
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+pre[data-language] {
+  border-radius: 12px;
+  border: 1px solid rgb(var(--border));
+  padding: 1rem 0;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+pre > code {
+  display: grid;
+  counter-reset: line;
+}
+
+/* 行号 */
+code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 2rem;
+  margin-right: 1rem;
+  text-align: right;
+  color: rgb(var(--muted) / 0.6);
+  font-size: 0.75rem;
+}
+
+[data-line] {
+  padding: 0 1rem;
+  border-left: 2px solid transparent;
+}
+
+/* 高亮行 */
+[data-highlighted-line] {
+  background-color: rgba(99, 102, 241, 0.08);
+  border-left-color: #6366F1;
+}
+
+/* 代码语言标签 */
+figure[data-rehype-pretty-code-figure]::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(var(--muted) / 0.7);
+  background: rgb(var(--card) / 0.8);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+/* 双主题：默认显示亮色，.dark 切换为深色 */
+[data-theme="github-dark-dimmed"] {
+  display: none;
+}
+.dark [data-theme="github-light"] {
+  display: none;
+}
+.dark [data-theme="github-dark-dimmed"] {
+  display: block;
+}
+
+/* 行内代码（非代码块） */
+:not(pre) > code {
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--border));
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+
+/* 标题锚点 - 鼠标悬浮显示 # */
+.prose .heading-anchor {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+}
+.prose .heading-anchor::before {
+  content: "#";
+  position: absolute;
+  left: -1.25rem;
+  color: rgb(var(--muted) / 0.4);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.prose .heading-anchor:hover::before {
+  opacity: 1;
 }

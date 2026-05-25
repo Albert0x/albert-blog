@@ -1,0 +1,124 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, Calendar, Clock, MessageSquare } from "lucide-react";
+import { Container } from "@/components/ui/Container";
+import { MdxContent } from "@/components/blog/MdxContent";
+import { GiscusComments } from "@/components/comments/Giscus";
+import { getAllPosts, getPostBySlug } from "@/lib/mdx";
+import { formatDate } from "@/lib/utils";
+
+// 老王说明：构建期生成所有文章静态路由
+export function generateStaticParams() {
+  return getAllPosts().map((p) => ({ slug: p.slug }));
+}
+
+// 老王说明：动态生成每篇文章的 SEO 元信息
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const post = getPostBySlug(params.slug);
+  if (!post) return { title: "文章不存在" };
+  return {
+    title: post.title,
+    description: post.description,
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      type: "article",
+      publishedTime: post.date,
+      tags: post.tags,
+    },
+  };
+}
+
+export default function PostPage({ params }: { params: { slug: string } }) {
+  const post = getPostBySlug(params.slug);
+  if (!post) notFound();
+
+  return (
+    <article className="py-12">
+      <Container size="narrow">
+        {/* 返回链接 */}
+        <Link
+          href="/blog"
+          className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-brand transition-colors mb-8"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          返回文章列表
+        </Link>
+
+        {/* 文章头部 */}
+        <header className="mb-10">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="inline-flex items-center rounded-full bg-gradient-brand-soft px-3 py-1 text-xs font-medium text-brand">
+              {post.category}
+            </span>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-balance leading-[1.15] mb-4">
+            {post.title}
+          </h1>
+
+          {post.description && (
+            <p className="text-lg text-muted text-balance mb-6">
+              {post.description}
+            </p>
+          )}
+
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted border-t border-border/60 pt-5">
+            <span className="inline-flex items-center gap-1.5">
+              <Calendar className="h-4 w-4" />
+              {formatDate(post.date)}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-4 w-4" />
+              {post.readingMinutes} 分钟阅读
+            </span>
+            {post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {post.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="text-xs border border-border/60 rounded px-2 py-0.5"
+                  >
+                    #{t}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        </header>
+
+        {/* 正文（typography 排版） */}
+        <div className="prose prose-zinc dark:prose-invert max-w-none prose-headings:scroll-mt-24 prose-headings:tracking-tight prose-a:text-brand prose-a:no-underline hover:prose-a:underline prose-code:text-brand prose-code:before:content-none prose-code:after:content-none">
+          <MdxContent source={post.content} />
+        </div>
+
+        {/* 底部分割 + 返回 */}
+        <div className="mt-16 pt-8 border-t border-border/60 flex justify-between items-center">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-brand transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            更多文章
+          </Link>
+          <span className="text-xs text-muted">— Albert</span>
+        </div>
+
+        {/* 老王说明：Giscus 评论区，基于 GitHub Discussions，每篇文章按 pathname 自动创建独立 Issue */}
+        <section className="mt-16 pt-8 border-t border-border/60">
+          <div className="flex items-center gap-2 mb-6">
+            <MessageSquare className="h-5 w-5 text-brand" />
+            <h2 className="text-lg font-semibold">评论 & 讨论</h2>
+            <span className="text-xs text-muted">· 由 GitHub Discussions 驱动</span>
+          </div>
+          <GiscusComments />
+        </section>
+      </Container>
+    </article>
+  );
+}
