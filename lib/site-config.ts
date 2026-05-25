@@ -11,8 +11,8 @@ export const siteConfig = {
     role: "全栈开发者 / 工业互联网实践者 / AI 应用探索者",
     bio: "工业互联网与 AI 应用的学习者与实践者，以 React + Python 为主力栈，探索全栈工程与领域结合的可能。",
     avatar: "/avatar.png", // TODO: 上传头像后替换
-    email: "3244522141@qq.com", // TODO: 替换为真实邮箱
-    github: "https://github.com/", // TODO: 替换 GitHub 链接
+    email: ".com", // TODO: 替换为真实邮箱
+    github: "https://github.com/Albert0x", // Albert 的 GitHub 主页
   },
   // 顶部导航配置
   nav: [
@@ -31,7 +31,7 @@ export const siteConfig = {
   //   4. 去 https://giscus.app 填配置，拿到 repoId 和 categoryId
   //   5. 把下面 5 个 TODO 字段填好就 OK
   giscus: {
-    repo: "your-github/your-repo" as `${string}/${string}`, // TODO: 替换为实际仓库
+    repo: "Albert0x/albert-blog" as `${string}/${string}`, // 博客评论数据源仓库
     repoId: "REPLACE_WITH_REPO_ID", // TODO: 从 giscus.app 复制
     category: "Announcements", // TODO: Discussion 分类名
     categoryId: "REPLACE_WITH_CATEGORY_ID", // TODO: 从 giscus.app 复制

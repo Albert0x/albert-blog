@@ -99,7 +99,7 @@ export default function AboutPage() {
           </p>
         </header>
         <div className="grid md:grid-cols-3 gap-4">
-          <a
+          {/* <a
             href={`mailto:${siteConfig.author.email}`}
             className="card-hover group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-5"
           >
@@ -112,7 +112,7 @@ export default function AboutPage() {
                 {siteConfig.author.email}
               </div>
             </div>
-          </a>
+          </a> */}
           <a
             href={siteConfig.author.github}
             target="_blank"
@@ -125,7 +125,7 @@ export default function AboutPage() {
             <div>
               <div className="text-xs text-muted">GitHub</div>
               <div className="text-sm font-medium group-hover:text-brand transition-colors">
-                https://github.com/dongxiaotong183/albert-blog
+                @Albert0x
               </div>
             </div>
           </a>
