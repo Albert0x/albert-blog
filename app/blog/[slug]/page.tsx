@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, Clock, MessageSquare } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Avatar } from "@/components/ui/Avatar";
 import { MdxContent } from "@/components/blog/MdxContent";
+import { LikeButton } from "@/components/blog/LikeButton";
 import { GiscusComments } from "@/components/comments/Giscus";
 import { siteConfig } from "@/lib/site-config";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
@@ -99,8 +100,13 @@ export default function PostPage({ params }: { params: { slug: string } }) {
           <MdxContent source={post.content} />
         </div>
 
+        {/* 老王说明：点赞按钮 - 匿名访客也能点，Cookie 永久去重 */}
+        <div className="mt-16 flex justify-center">
+          <LikeButton slug={post.slug} />
+        </div>
+
         {/* 底部分割 + 返回 + 作者签名 */}
-        <div className="mt-16 pt-8 border-t border-border/60 flex justify-between items-center gap-4 flex-wrap">
+        <div className="mt-12 pt-8 border-t border-border/60 flex justify-between items-center gap-4 flex-wrap">
           <Link
             href="/blog"
             className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-brand transition-colors"
