@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Mail, Github, MapPin, Briefcase } from "lucide-react";
+import { Github, MapPin, Briefcase } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { DomainMap } from "@/components/about/DomainMap";
 import { SkillMatrix } from "@/components/about/SkillMatrix";
