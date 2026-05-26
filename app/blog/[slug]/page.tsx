@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, MessageSquare } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { Avatar } from "@/components/ui/Avatar";
 import { MdxContent } from "@/components/blog/MdxContent";
 import { GiscusComments } from "@/components/comments/Giscus";
+import { siteConfig } from "@/lib/site-config";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
 import { formatDate } from "@/lib/utils";
 
@@ -97,8 +99,8 @@ export default function PostPage({ params }: { params: { slug: string } }) {
           <MdxContent source={post.content} />
         </div>
 
-        {/* 底部分割 + 返回 */}
-        <div className="mt-16 pt-8 border-t border-border/60 flex justify-between items-center">
+        {/* 底部分割 + 返回 + 作者签名 */}
+        <div className="mt-16 pt-8 border-t border-border/60 flex justify-between items-center gap-4 flex-wrap">
           <Link
             href="/blog"
             className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-brand transition-colors"
@@ -106,7 +108,17 @@ export default function PostPage({ params }: { params: { slug: string } }) {
             <ArrowLeft className="h-4 w-4" />
             更多文章
           </Link>
-          <span className="text-xs text-muted">— Albert</span>
+          {/* 老王说明：作者签名加头像，提升个人品牌识别度 */}
+          <Link
+            href="/about"
+            className="inline-flex items-center gap-2.5 text-xs text-muted hover:text-brand transition-colors group"
+          >
+            <Avatar size="sm" className="group-hover:ring-2 ring-brand/40 transition-all" />
+            <span className="flex flex-col items-end">
+              <span className="text-foreground/80 font-medium">{siteConfig.author.name}</span>
+              <span className="text-[10px]">{siteConfig.author.role.split(" / ")[0]}</span>
+            </span>
+          </Link>
         </div>
 
         {/* 老王说明：Giscus 评论区，基于 GitHub Discussions，每篇文章按 pathname 自动创建独立 Issue */}

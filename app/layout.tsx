@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { Navbar } from "@/components/nav/Navbar";
 import { Footer } from "@/components/common/Footer";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { ChatWidget } from "@/components/chat/ChatWidget";
 import { siteConfig } from "@/lib/site-config";
 
 const geistSans = localFont({
@@ -57,10 +59,15 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen flex flex-col`}
       >
-        <Navbar />
-        {/* 顶部留出 Navbar 高度 */}
-        <main className="flex-1 pt-16">{children}</main>
-        <Footer />
+        {/* 老王说明：ThemeProvider 必须包在最外层，否则 useTheme 读不到上下文 */}
+        <ThemeProvider>
+          <Navbar />
+          {/* 顶部留出 Navbar 高度 */}
+          <main className="flex-1 pt-16">{children}</main>
+          <Footer />
+          {/* 老王说明：AI 博客助手 - 全站右下角浮动按钮，未配置 API Key 时调用会提示，不影响其他功能 */}
+          <ChatWidget />
+        </ThemeProvider>
       </body>
     </html>
   );

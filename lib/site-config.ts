@@ -10,7 +10,11 @@ export const siteConfig = {
     name: "Albert",
     role: "全栈开发者 / 工业互联网实践者 / AI 应用探索者",
     bio: "工业互联网与 AI 应用的学习者与实践者，以 React + Python 为主力栈，探索全栈工程与领域结合的可能。",
-    avatar: "/avatar.png", // TODO: 上传头像后替换
+    // 老王说明：头像 - 直连 GitHub 头像 URL，永久同步
+    // 想换头像？在 https://github.com/Albert0x 改头像，博客自动跟着换，0 维护
+    // 想用本地图：把照片放到 public/avatar.png，改这里为 "/avatar.png"
+    // 想用 SVG 占位：改回 "/avatar.svg"
+    avatar: "https://github.com/Albert0x.png",
     email: ".com", // TODO: 替换为真实邮箱
     github: "https://github.com/Albert0x", // Albert 的 GitHub 主页
   },

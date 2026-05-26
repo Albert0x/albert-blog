@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { Github, Menu, X } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { Container } from "@/components/ui/Container";
+import { Avatar } from "@/components/ui/Avatar";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 // 老王说明：顶部毛玻璃导航
@@ -79,6 +81,8 @@ export function Navbar() {
 
           {/* 右侧操作 */}
           <div className="flex items-center gap-2">
+            {/* 老王说明：主题切换按钮 - 桌面 + 移动端都显示 */}
+            <ThemeToggle />
             <a
               href={siteConfig.author.github}
               target="_blank"
@@ -88,6 +92,15 @@ export function Navbar() {
             >
               <Github className="h-4 w-4" />
             </a>
+            {/* 老王说明：右上头像 → 点击跳关于页，悬浮放大 + 渐变光圈 */}
+            <Link
+              href="/about"
+              className="hidden md:inline-flex items-center group"
+              aria-label="关于我"
+              onClick={() => setMenuOpen(false)}
+            >
+              <Avatar size="sm" className="group-hover:ring-2 ring-brand/40 transition-all group-hover:scale-110" />
+            </Link>
             <button
               type="button"
               onClick={() => setMenuOpen((v) => !v)}

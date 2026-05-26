@@ -1,6 +1,8 @@
 "use client";
 
 import Giscus from "@giscus/react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 import { siteConfig } from "@/lib/site-config";
 
 // 老王说明：Giscus 评论组件
@@ -18,6 +20,18 @@ interface GiscusCommentsProps {
 
 export function GiscusComments({ mapping, term }: GiscusCommentsProps = {}) {
   const cfg = siteConfig.giscus;
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // 老王说明：hydration 防闪烁 - 客户端 mount 后再确定 Giscus 主题
+  useEffect(() => setMounted(true), []);
+
+  // 老王说明：主题映射 - resolvedTheme 在 system 模式下会被解析为 light/dark
+  const giscusTheme = !mounted
+    ? "preferred_color_scheme"
+    : resolvedTheme === "dark"
+      ? "dark_dimmed"
+      : "light";
 
   // 老王说明：未配置时显示占位，避免控制台一堆错
   // 检查 repoId 是不是占位字符串
@@ -57,7 +71,7 @@ export function GiscusComments({ mapping, term }: GiscusCommentsProps = {}) {
       reactionsEnabled={cfg.reactionsEnabled ? "1" : "0"}
       emitMetadata="0"
       inputPosition={cfg.inputPosition}
-      theme="preferred_color_scheme"
+      theme={giscusTheme}
       lang={cfg.lang}
       loading="lazy"
     />

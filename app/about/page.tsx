@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Github, MapPin, Briefcase } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { Avatar } from "@/components/ui/Avatar";
 import { DomainMap } from "@/components/about/DomainMap";
 import { SkillMatrix } from "@/components/about/SkillMatrix";
 import { Timeline } from "@/components/about/Timeline";
@@ -18,14 +19,20 @@ export default function AboutPage() {
     <Container size="default" className="py-16">
       {/* Hero 介绍区 */}
       <section className="mb-20">
-        <div className="flex items-center gap-2 text-sm text-muted mb-3">
-          <Briefcase className="h-4 w-4 text-brand" />
-          全栈开发者 · 工业互联网实践者 · AI 应用探索者
+        {/* 老王说明：头像 + 身份标签 横向排布；移动端竖向堆叠 */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 mb-6">
+          <Avatar size="xl" ring className="animate-float-slow" />
+          <div>
+            <div className="flex items-center gap-2 text-sm text-muted mb-3">
+              <Briefcase className="h-4 w-4 text-brand" />
+              全栈开发者 · 工业互联网实践者 · AI 应用探索者
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-balance leading-[1.15]">
+              你好，我是
+              <span className="text-gradient-brand"> {siteConfig.name}</span>
+            </h1>
+          </div>
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-balance leading-[1.15] mb-6">
-          你好，我是
-          <span className="text-gradient-brand"> {siteConfig.name}</span>
-        </h1>
         <div className="prose prose-zinc dark:prose-invert max-w-none">
           <p>
             一个对 <strong>工业互联网</strong> 和 <strong>AI 应用</strong>{" "}
