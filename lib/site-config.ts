@@ -32,9 +32,9 @@ export const siteConfig = {
   //   5. 把下面 5 个 TODO 字段填好就 OK
   giscus: {
     repo: "Albert0x/albert-blog" as `${string}/${string}`, // 博客评论数据源仓库
-    repoId: "REPLACE_WITH_REPO_ID", // TODO: 从 giscus.app 复制
+    repoId: "R_kgDOSnFaHA", // TODO: 从 giscus.app 复制
     category: "Announcements", // TODO: Discussion 分类名
-    categoryId: "REPLACE_WITH_CATEGORY_ID", // TODO: 从 giscus.app 复制
+    categoryId: "DIC_kwDOSnFaHM4C92K0", // TODO: 从 giscus.app 复制
     // mapping: 文章用 pathname（每篇文章一个独立 Issue）
     mapping: "pathname" as const,
     // 留言板用 specific term，所有留言聚在同一个 Issue
