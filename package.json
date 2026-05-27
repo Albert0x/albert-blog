@@ -22,6 +22,7 @@
     "ai": "^6.0.191",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
+    "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.469.0",
     "minisearch": "^7.2.0",

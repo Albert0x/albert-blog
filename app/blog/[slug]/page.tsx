@@ -6,7 +6,9 @@ import { Container } from "@/components/ui/Container";
 import { Avatar } from "@/components/ui/Avatar";
 import { MdxContent } from "@/components/blog/MdxContent";
 import { LikeButton } from "@/components/blog/LikeButton";
+import { TableOfContents } from "@/components/blog/TableOfContents";
 import { GiscusComments } from "@/components/comments/Giscus";
+import { extractToc } from "@/lib/toc";
 import { siteConfig } from "@/lib/site-config";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
 import { formatDate } from "@/lib/utils";
@@ -41,8 +43,14 @@ export default function PostPage({ params }: { params: { slug: string } }) {
   const post = getPostBySlug(params.slug);
   if (!post) notFound();
 
+  // 老王说明：从 MDX 正文提取 TOC（h2 / h3），传给侧边栏组件
+  const toc = extractToc(post.content);
+
   return (
-    <article className="py-12">
+    <article className="py-12 relative">
+      {/* 老王说明：TOC 自己 fixed 定位，不影响主流布局 */}
+      <TableOfContents items={toc} />
+
       <Container size="narrow">
         {/* 返回链接 */}
         <Link

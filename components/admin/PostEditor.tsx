@@ -68,13 +68,36 @@ function buildMdx(fm: Frontmatter, body: string): string {
 }
 
 // 老王说明：把 title 转成 url-friendly slug（仅新建模式自动生成）
+// ⚠️ slug 必须符合 API 校验：只允许 a-z 0-9 - _（不能有空格 / 中文 / 大写）
+// 中文标题 → 自动 fallback 到「post-时间戳」格式
 function generateSlug(title: string): string {
-  return title
+  const cleaned = title
     .toLowerCase()
-    .replace(/[^a-z0-9一-鿿\s-]/g, "")
-    .trim()
+    // 先把空格统一成连字符
     .replace(/\s+/g, "-")
-    .slice(0, 60) || "untitled";
+    // 只保留合法字符
+    .replace(/[^a-z0-9-_]/g, "")
+    // 合并多个连字符
+    .replace(/-+/g, "-")
+    // 去掉首尾连字符
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+
+  // 全中文标题清理后是空字符串 → 用时间戳兜底
+  if (!cleaned) {
+    return `post-${Date.now().toString(36)}`;
+  }
+  return cleaned;
+}
+
+// 老王说明：用户手动编辑 slug 时的实时净化（防止输入非法字符）
+function sanitizeSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-_]/g, "")
+    .replace(/-+/g, "-")
+    .slice(0, 60);
 }
 
 const CATEGORIES = [
@@ -292,7 +315,7 @@ export function PostEditor({
           <input
             type="text"
             value={slug}
-            onChange={(e) => setSlug(e.target.value)}
+            onChange={(e) => setSlug(sanitizeSlug(e.target.value))}
             disabled={isEdit}
             placeholder="my-first-post"
             className="mt-1 w-full rounded-lg border border-border/60 bg-background px-3 py-2 text-sm font-mono placeholder:text-muted/60 focus:outline-none focus:border-brand disabled:opacity-60"
