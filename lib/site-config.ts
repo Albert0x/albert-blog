@@ -49,6 +49,20 @@ export const siteConfig = {
     lang: "zh-CN",
   },
 
+  // ===== 搜索引擎站长验证（一次配好永久受用）=====
+  // 老王说明：去各家站长平台拿验证码填到这里，下次部署生效
+  // 1) Google Search Console: https://search.google.com/search-console
+  //    选「HTML tag」验证方式 → 复制 content="xxxxxxxxxx" 填到 google
+  // 2) 百度站长平台: https://ziyuan.baidu.com
+  //    选「HTML 标签验证」→ 复制 content="xxxxxxxxxx" 填到 baidu
+  // 3) Bing Webmaster: https://www.bing.com/webmasters
+  //    可一键从 Google 导入，也可填 msvalidate.01 的值到 bing
+  verification: {
+    google: "", // TODO: Google Search Console meta content
+    baidu: "", // TODO: 百度站长 meta content
+    bing: "", // TODO: Bing Webmaster meta content
+  },
+
   // 三大内容方向 - 首页和关于页都会用到
   pillars: [
     {

@@ -18,6 +18,18 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+// 老王说明：构建 verification.other 对象（只在配了值时才放进去，避免 undefined 值触发 TS 类型错误）
+function buildVerificationOther(): Record<string, string> {
+  const other: Record<string, string> = {};
+  if (siteConfig.verification.baidu) {
+    other["baidu-site-verification"] = siteConfig.verification.baidu;
+  }
+  if (siteConfig.verification.bing) {
+    other["msvalidate.01"] = siteConfig.verification.bing;
+  }
+  return other;
+}
+
 // 老王说明：站点级 SEO 元信息，从 siteConfig 取，单点维护
 export const metadata: Metadata = {
   title: {
@@ -47,6 +59,59 @@ export const metadata: Metadata = {
     locale: "zh_CN",
     type: "website",
   },
+  // 老王说明：搜索引擎站长验证 meta（在 siteConfig.verification 配好后自动渲染）
+  // 任一为空时 Next.js 自动不输出对应 meta，不影响页面
+  verification: {
+    google: siteConfig.verification.google || undefined,
+    other: buildVerificationOther(),
+  },
+  // 让搜索引擎友好地知道站点的备用 feed
+  alternates: {
+    canonical: siteConfig.url,
+    types: {
+      "application/rss+xml": `${siteConfig.url}/feed.xml`,
+    },
+  },
+  // 默认让爬虫尽量收录（admin 等敏感页已在 robots.ts 单独 disallow）
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+};
+
+// 老王说明：全站 JSON-LD 结构化数据
+// 让搜索引擎更好地理解「这是个个人博客 + Albert 是博主」
+// 测试工具：https://search.google.com/test/rich-results
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteConfig.url}/#website`,
+      url: siteConfig.url,
+      name: siteConfig.name,
+      description: siteConfig.description,
+      inLanguage: "zh-CN",
+      publisher: { "@id": `${siteConfig.url}/#person` },
+    },
+    {
+      "@type": "Person",
+      "@id": `${siteConfig.url}/#person`,
+      name: siteConfig.author.name,
+      url: siteConfig.url,
+      image: siteConfig.author.avatar,
+      description: siteConfig.author.bio,
+      sameAs: [siteConfig.author.github].filter(Boolean),
+      jobTitle: siteConfig.author.role,
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -56,6 +121,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
+      <head>
+        {/* 老王说明：全站 JSON-LD（Person + WebSite），给搜索引擎吃的结构化数据 */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased min-h-screen flex flex-col`}
       >
