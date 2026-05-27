@@ -2,11 +2,11 @@ import { Github, ShieldCheck } from "lucide-react";
 import { signIn } from "@/auth";
 import { siteConfig } from "@/lib/site-config";
 
-// 老王说明：后台登录页
-// - 唯一登录方式：GitHub OAuth（点按钮跳到 GitHub 授权）
-// - 通过 Server Action 触发 signIn，更安全（不暴露 client_id）
-// - 失败时显示原因（通常是白名单拦截）
-export default async function AdminLoginPage({
+// 老王说明：登录页
+// - ⚠️ 路径必须放在 /login 而不是 /admin/login，否则会被 admin/layout 守卫造成死循环
+// - 唯一登录方式：GitHub OAuth
+// - 通过 Server Action 触发 signIn，安全且不暴露 client_id
+export default async function LoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ error?: string; from?: string }>;

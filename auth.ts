@@ -24,7 +24,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   pages: {
-    signIn: "/admin/login",
+    // 老王说明：放在 /login 而非 /admin/login，避免被 admin/layout 守卫造成死循环
+    signIn: "/login",
   },
   callbacks: {
     // 老王说明：登录拦截 - 不在白名单的 GitHub 用户拒绝登录
