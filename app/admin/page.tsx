@@ -89,16 +89,20 @@ export default async function AdminHomePage() {
       ) : (
         <div className="grid gap-3">
           {rows.map((r) => (
-            <Link
+            // 老王说明：把外层从 <Link> 改成 <div>，避免链接嵌套链接
+            // 这样 RSC 也不需要 onClick stopPropagation 这种 Client 端事件
+            <div
               key={r.slug}
-              href={`/admin/edit/${r.slug}`}
               className="group flex items-center gap-4 rounded-xl border border-border/60 bg-card hover:border-brand/40 hover:bg-gradient-brand-soft p-4 transition-all"
             >
               {/* 分类色块 */}
               <div className="h-12 w-1 rounded-full bg-gradient-brand shrink-0" />
 
-              {/* 信息 */}
-              <div className="flex-1 min-w-0">
+              {/* 主内容（点击区） */}
+              <Link
+                href={`/admin/edit/${r.slug}`}
+                className="flex-1 min-w-0"
+              >
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-[10px] inline-flex items-center rounded-full bg-gradient-brand-soft px-2 py-0.5 text-brand">
                     {r.category}
@@ -113,7 +117,7 @@ export default async function AdminHomePage() {
                     {r.description}
                   </p>
                 )}
-              </div>
+              </Link>
 
               {/* 文件大小 */}
               <div className="hidden sm:flex flex-col items-end text-[10px] text-muted shrink-0">
@@ -121,19 +125,18 @@ export default async function AdminHomePage() {
                 <span className="opacity-50">{r.slug}.mdx</span>
               </div>
 
-              {/* 在线访问 */}
+              {/* 在线访问（独立链接，不嵌套 - 也消除 onClick 需求） */}
               <a
                 href={`/blog/${r.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
                 className="grid place-items-center h-8 w-8 rounded-md text-muted hover:text-brand hover:bg-foreground/5 transition-colors shrink-0"
                 aria-label="查看线上"
                 title="查看线上"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
-            </Link>
+            </div>
           ))}
         </div>
       )}
