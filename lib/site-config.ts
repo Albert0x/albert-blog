@@ -58,7 +58,7 @@ export const siteConfig = {
   // 3) Bing Webmaster: https://www.bing.com/webmasters
   //    可一键从 Google 导入，也可填 msvalidate.01 的值到 bing
   verification: {
-    google: "", // TODO: Google Search Console meta content
+    google: "urBt6tEJkzvMvICQpGOPPDt0Z9BXZI1dGxczEYOF2wY", // TODO: Google Search Console meta content
     baidu: "", // TODO: 百度站长 meta content
     bing: "", // TODO: Bing Webmaster meta content
   },
