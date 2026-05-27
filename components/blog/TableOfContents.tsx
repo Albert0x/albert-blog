@@ -76,8 +76,8 @@ export function TableOfContents({ items }: TableOfContentsProps) {
 
   return (
     <>
-      {/* ============== 桌面端：右侧 sticky 边栏 ============== */}
-      <aside className="hidden xl:block fixed top-24 right-4 2xl:right-12 w-56 max-h-[calc(100vh-8rem)] z-20">
+      {/* ============== 桌面端：左侧 sticky 边栏 ============== */}
+      <aside className="hidden xl:block fixed top-24 left-4 2xl:left-12 w-56 max-h-[calc(100vh-8rem)] z-20">
         <div className="rounded-2xl border border-border/60 bg-card/60 backdrop-blur-md p-4 max-h-[calc(100vh-8rem)] flex flex-col">
           {/* 标题 + 进度 */}
           <div className="flex items-center gap-2 mb-3 pb-3 border-b border-border/40">
@@ -114,7 +114,7 @@ export function TableOfContents({ items }: TableOfContentsProps) {
         </div>
       </aside>
 
-      {/* ============== 移动端 / 平板：左下角浮动按钮 ============== */}
+      {/* ============== 移动端 / 平板：右下角浮动按钮（避开 AI 助手按钮位置） ============== */}
       <button
         type="button"
         onClick={() => setMobileOpen(true)}

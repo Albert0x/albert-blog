@@ -7,6 +7,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { MdxContent } from "@/components/blog/MdxContent";
 import { LikeButton } from "@/components/blog/LikeButton";
 import { TableOfContents } from "@/components/blog/TableOfContents";
+import { PostNavigation } from "@/components/blog/PostNavigation";
 import { GiscusComments } from "@/components/comments/Giscus";
 import { extractToc } from "@/lib/toc";
 import { siteConfig } from "@/lib/site-config";
@@ -45,6 +46,12 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
   // 老王说明：从 MDX 正文提取 TOC（h2 / h3），传给侧边栏组件
   const toc = extractToc(post.content);
+
+  // 老王说明：找出上一篇 / 下一篇（按日期降序，前一项=更新，后一项=更旧）
+  const allPosts = getAllPosts();
+  const idx = allPosts.findIndex((p) => p.slug === post.slug);
+  const prev = idx > 0 ? allPosts[idx - 1] : null;
+  const next = idx < allPosts.length - 1 && idx !== -1 ? allPosts[idx + 1] : null;
 
   return (
     <article className="py-12 relative">
@@ -134,6 +141,9 @@ export default function PostPage({ params }: { params: { slug: string } }) {
             </span>
           </Link>
         </div>
+
+        {/* 老王说明：上一篇 / 下一篇导航 */}
+        <PostNavigation prev={prev} next={next} />
 
         {/* 老王说明：Giscus 评论区，基于 GitHub Discussions，每篇文章按 pathname 自动创建独立 Issue */}
         <section className="mt-16 pt-8 border-t border-border/60">

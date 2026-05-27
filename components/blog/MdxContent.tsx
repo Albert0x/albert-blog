@@ -1,11 +1,12 @@
 import { MDXRemote, type MDXRemoteProps } from "next-mdx-remote/rsc";
 import { mdxOptions } from "@/lib/mdx-options";
+import { Pre } from "./Pre";
 
 // 老王说明：MDX 服务端渲染组件
-// 后续可在这里加自定义 MDX 组件（比如 <Callout/>、<CodeSandbox/>）
+// 自定义 components 在这里覆盖原生 HTML 标签：
+//   - pre: 替换成带「复制按钮」的客户端组件
 const components = {
-  // 自定义组件可以加在这里，比如：
-  // Callout: (props: any) => <div className="callout">{props.children}</div>,
+  pre: Pre,
 };
 
 export function MdxContent({ source }: { source: string }) {
