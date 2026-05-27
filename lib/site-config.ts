@@ -5,7 +5,7 @@ export const siteConfig = {
   title: "Albert | 全栈开发者 · 工业互联网实践者 · AI 应用探索者",
   description:
     "把代码写进车间，把 AI 带入工厂。Albert的个人技术博客，分享工业互联网、能源碳管理、AI 应用与全栈工程实践。",
-  url: "https://albert.dev", // TODO: 实际域名上线后替换
+  url: "https://albert0x.vercel.app", // 上线域名（未来买自定义域名后改这里）
   author: {
     name: "Albert",
     role: "全栈开发者 / 工业互联网实践者 / AI 应用探索者",
