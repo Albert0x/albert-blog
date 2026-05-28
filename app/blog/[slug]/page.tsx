@@ -65,8 +65,20 @@ export default function PostPage({ params }: { params: { slug: string } }) {
   const prev = idx > 0 ? allPosts[idx - 1] : null;
   const next = idx < allPosts.length - 1 && idx !== -1 ? allPosts[idx + 1] : null;
 
-  // 老王说明：文章级 JSON-LD（Article schema）- 帮搜索引擎生成富媒体卡片
   const baseUrl = siteConfig.url.replace(/\/$/, "");
+
+  // 老王说明：面包屑 JSON-LD - 「首页 › 博客 › 文章标题」，SERP 显示路径提升 CTR
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "首页", item: baseUrl },
+      { "@type": "ListItem", position: 2, name: "博客", item: `${baseUrl}/blog` },
+      { "@type": "ListItem", position: 3, name: post.title, item: `${baseUrl}/blog/${post.slug}` },
+    ],
+  };
+
+  // 老王说明：文章级 JSON-LD（Article schema）- 帮搜索引擎生成富媒体卡片
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -91,6 +103,10 @@ export default function PostPage({ params }: { params: { slug: string } }) {
 
   return (
     <article className="py-12 relative">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}

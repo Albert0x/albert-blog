@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PostCard } from "@/components/blog/PostCard";
 import { getAllPosts, getAllCategories } from "@/lib/mdx";
+import { siteConfig } from "@/lib/site-config";
 
 // 老王说明：文章列表页
 // 当前版本：直接列出所有文章 + 分类筛选 chip（点击跳转分类页，下个迭代实现）
@@ -10,12 +11,36 @@ export const metadata: Metadata = {
   description: "工业互联网、AI 应用、全栈工程实践笔记。",
 };
 
+// 老王说明：博客列表页 BreadcrumbList - 让 Google SERP 显示「首页 › 博客」路径
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    {
+      "@type": "ListItem",
+      position: 1,
+      name: "首页",
+      item: siteConfig.url,
+    },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "博客",
+      item: `${siteConfig.url}/blog`,
+    },
+  ],
+};
+
 export default function BlogIndexPage() {
   const posts = getAllPosts();
   const categories = getAllCategories();
 
   return (
     <Container size="wide" className="py-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* 标题区 */}
       <header className="mb-10">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
