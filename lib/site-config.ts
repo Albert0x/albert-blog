@@ -59,7 +59,7 @@ export const siteConfig = {
   //    可一键从 Google 导入，也可填 msvalidate.01 的值到 bing
   verification: {
     google: "urBt6tEJkzvMvICQpGOPPDt0Z9BXZI1dGxczEYOF2wY", // TODO: Google Search Console meta content
-    baidu: "", // TODO: 百度站长 meta content
+    baidu: "codeva-S2KoFbKxc8", // 百度站长 HTML 标签验证 content 值
     bing: "", // TODO: Bing Webmaster meta content
   },
 

@@ -6,6 +6,10 @@ import { Footer } from "@/components/common/Footer";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ChatWidget } from "@/components/chat/ChatWidget";
 import { siteConfig } from "@/lib/site-config";
+// 老王说明：Vercel 官方数据采集 - Analytics 看流量 PV/UV，Speed Insights 看 Core Web Vitals
+// 仅在 Vercel 平台部署时自动上报，本地开发不会触发，零侵入
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,6 +36,9 @@ function buildVerificationOther(): Record<string, string> {
 
 // 老王说明：站点级 SEO 元信息，从 siteConfig 取，单点维护
 export const metadata: Metadata = {
+  // 老王说明：metadataBase 用于把相对 URL（OG/Twitter 图、canonical）解析成绝对 URL
+  // 不设这玩意儿，Next.js 构建时会警告并回退到 localhost:3000，生产分享卡片直接挂
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: siteConfig.title,
     template: `%s | ${siteConfig.name}`,
@@ -58,6 +65,15 @@ export const metadata: Metadata = {
     siteName: siteConfig.name,
     locale: "zh_CN",
     type: "website",
+  },
+  // 老王说明：Twitter / X 分享时的卡片样式
+  // summary_large_image = 大图卡片，比默认小图卡 CTR 高 2~3 倍
+  // 图自动取 app/twitter-image.tsx（Edge 动态生成的 1200×630 OG 图）
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.title,
+    description: siteConfig.description,
+    creator: "@Albert0x",
   },
   // 老王说明：搜索引擎站长验证 meta（在 siteConfig.verification 配好后自动渲染）
   // 任一为空时 Next.js 自动不输出对应 meta，不影响页面
@@ -140,6 +156,9 @@ export default function RootLayout({
           {/* 老王说明：AI 博客助手 - 全站右下角浮动按钮，未配置 API Key 时调用会提示，不影响其他功能 */}
           <ChatWidget />
         </ThemeProvider>
+        {/* 老王说明：放 body 末尾，不阻塞首屏渲染 */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -30,12 +30,24 @@ export async function generateMetadata({
   return {
     title: post.title,
     description: post.description,
+    // 老王说明：每篇文章独立的 canonical，防止重复内容稀释权重
+    alternates: {
+      canonical: `${siteConfig.url.replace(/\/$/, "")}/blog/${post.slug}`,
+    },
     openGraph: {
       title: post.title,
       description: post.description,
       type: "article",
       publishedTime: post.date,
       tags: post.tags,
+      authors: [siteConfig.author.name],
+    },
+    // 老王说明：文章级 Twitter Card - 图自动取本文件目录下 opengraph-image.tsx 动态生成
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      creator: "@Albert0x",
     },
   };
 }
