@@ -122,7 +122,32 @@ export function PostPreview({ body, frontmatter }: Props) {
               prose-code:text-brand prose-code:before:content-none prose-code:after:content-none
               prose-pre:text-xs"
           >
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                // 老王说明：预览里也尊重 |WxH alt 后缀，做尺寸预览
+                // 不走 next/image（预览不需要优化），但保留 lazy + 尺寸 + 圆角
+                img: ({ src, alt: rawAlt, title }) => {
+                  if (!src) return null;
+                  const sizeMatch = rawAlt?.match(/^(.*?)\|(\d+)x(\d+)$/);
+                  const alt = sizeMatch ? sizeMatch[1].trim() : rawAlt ?? "";
+                  const width = sizeMatch ? Number(sizeMatch[2]) : undefined;
+                  const height = sizeMatch ? Number(sizeMatch[3]) : undefined;
+                  return (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={typeof src === "string" ? src : ""}
+                      alt={alt}
+                      title={title}
+                      width={width}
+                      height={height}
+                      loading="lazy"
+                      className="rounded-xl border border-border/40 my-4 max-w-full h-auto"
+                    />
+                  );
+                },
+              }}
+            >
               {deferredBody}
             </ReactMarkdown>
           </div>
