@@ -1,12 +1,19 @@
 import Link from "next/link";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Eye } from "lucide-react";
 import type { PostMeta } from "@/lib/mdx";
 import { formatDate } from "@/lib/utils";
 
 // 老王说明：文章列表卡片
 // - 渐变描边：hover 时显示彩色边框
 // - 分类彩色 chip
-export function PostCard({ post }: { post: PostMeta }) {
+// - views 可选（列表页通过 getViewsBatch 一次拿来批量传入，未传则不展示）
+export function PostCard({
+  post,
+  views,
+}: {
+  post: PostMeta;
+  views?: number;
+}) {
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -31,7 +38,7 @@ export function PostCard({ post }: { post: PostMeta }) {
         </p>
       )}
 
-      <div className="flex items-center gap-4 text-xs text-muted">
+      <div className="flex items-center gap-4 text-xs text-muted flex-wrap">
         <span className="inline-flex items-center gap-1">
           <Calendar className="h-3 w-3" />
           {formatDate(post.date)}
@@ -40,6 +47,12 @@ export function PostCard({ post }: { post: PostMeta }) {
           <Clock className="h-3 w-3" />
           {post.readingMinutes} 分钟阅读
         </span>
+        {typeof views === "number" && views > 0 && (
+          <span className="inline-flex items-center gap-1">
+            <Eye className="h-3 w-3" />
+            {views.toLocaleString()}
+          </span>
+        )}
       </div>
 
       {post.tags.length > 0 && (

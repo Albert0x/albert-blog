@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/Container";
 import { PostCard } from "@/components/blog/PostCard";
 import { getAllPosts, getAllCategories } from "@/lib/mdx";
+import { getViewsBatch } from "@/lib/views";
 import { siteConfig } from "@/lib/site-config";
 
 // 老王说明：文章列表页
@@ -31,9 +32,11 @@ const breadcrumbJsonLd = {
   ],
 };
 
-export default function BlogIndexPage() {
+export default async function BlogIndexPage() {
   const posts = getAllPosts();
   const categories = getAllCategories();
+  // 老王说明：一次 mget 把全部文章的浏览量拿到，避免 N 次请求
+  const viewsMap = await getViewsBatch(posts.map((p) => p.slug));
 
   return (
     <Container size="wide" className="py-16">
@@ -76,7 +79,11 @@ export default function BlogIndexPage() {
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {posts.map((post) => (
-            <PostCard key={post.slug} post={post} />
+            <PostCard
+              key={post.slug}
+              post={post}
+              views={viewsMap[post.slug]}
+            />
           ))}
         </div>
       )}

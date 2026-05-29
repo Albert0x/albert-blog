@@ -7,6 +7,7 @@ import { PostCard } from "@/components/blog/PostCard";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { siteConfig } from "@/lib/site-config";
 import { getAllPosts } from "@/lib/mdx";
+import { getViewsBatch } from "@/lib/views";
 import { projects } from "@/lib/projects";
 
 // 老王说明：首页（Server Component）
@@ -14,9 +15,11 @@ import { projects } from "@/lib/projects";
 // Three.js 通过 Client Component + dynamic import 接入，零 SSR 包体污染
 const pillarIcons = { Factory, Sparkles, Code2 } as const;
 
-export default function Home() {
+export default async function Home() {
   const latestPosts = getAllPosts().slice(0, 3);
   const featuredProjects = projects.slice(0, 3);
+  // 老王说明：批量拿最新 3 篇浏览量
+  const viewsMap = await getViewsBatch(latestPosts.map((p) => p.slug));
 
   return (
     <>
@@ -135,7 +138,7 @@ export default function Home() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {latestPosts.map((p, i) => (
                 <AnimatedSection key={p.slug} delay={i * 0.08}>
-                  <PostCard post={p} />
+                  <PostCard post={p} views={viewsMap[p.slug]} />
                 </AnimatedSection>
               ))}
             </div>

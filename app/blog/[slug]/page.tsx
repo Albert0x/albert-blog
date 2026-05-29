@@ -8,10 +8,12 @@ import { MdxContent } from "@/components/blog/MdxContent";
 import { LikeButton } from "@/components/blog/LikeButton";
 import { TableOfContents } from "@/components/blog/TableOfContents";
 import { PostNavigation } from "@/components/blog/PostNavigation";
+import { ViewCounter } from "@/components/blog/ViewCounter";
 import { GiscusComments } from "@/components/comments/Giscus";
 import { extractToc } from "@/lib/toc";
 import { siteConfig } from "@/lib/site-config";
 import { getAllPosts, getPostBySlug } from "@/lib/mdx";
+import { getViews } from "@/lib/views";
 import { formatDate } from "@/lib/utils";
 
 // 老王说明：构建期生成所有文章静态路由
@@ -52,9 +54,16 @@ export async function generateMetadata({
   };
 }
 
-export default function PostPage({ params }: { params: { slug: string } }) {
+export default async function PostPage({
+  params,
+}: {
+  params: { slug: string };
+}) {
   const post = getPostBySlug(params.slug);
   if (!post) notFound();
+
+  // 老王说明：SSR 阶段先拿当前浏览量给 ViewCounter，避免客户端补数据时跳变
+  const initialViews = await getViews(params.slug);
 
   // 老王说明：从 MDX 正文提取 TOC（h2 / h3），传给侧边栏组件
   const toc = extractToc(post.content);
@@ -151,6 +160,8 @@ export default function PostPage({ params }: { params: { slug: string } }) {
               <Clock className="h-4 w-4" />
               {post.readingMinutes} 分钟阅读
             </span>
+            {/* 老王说明：浏览量徽章 - 客户端 mount 上报 + 实时显示 */}
+            <ViewCounter slug={post.slug} initialCount={initialViews} />
             {post.tags.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {post.tags.map((t) => (
