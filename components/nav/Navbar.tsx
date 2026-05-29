@@ -8,6 +8,7 @@ import { siteConfig } from "@/lib/site-config";
 import { Container } from "@/components/ui/Container";
 import { Avatar } from "@/components/ui/Avatar";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { SearchButton } from "@/components/search/SearchButton";
 import { cn } from "@/lib/utils";
 
 // 老王说明：顶部毛玻璃导航
@@ -81,6 +82,8 @@ export function Navbar() {
 
           {/* 右侧操作 */}
           <div className="flex items-center gap-2">
+            {/* 老王说明：站内搜索 - 长条按钮 + Ctrl/Cmd+K + / 三种触发 */}
+            <SearchButton />
             {/* 老王说明：主题切换按钮 - 桌面 + 移动端都显示 */}
             <ThemeToggle />
             <a
