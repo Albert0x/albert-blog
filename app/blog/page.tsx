@@ -7,6 +7,11 @@ import { siteConfig } from "@/lib/site-config";
 
 // 老王说明：文章列表页
 // 当前版本：直接列出所有文章 + 分类筛选 chip（点击跳转分类页，下个迭代实现）
+//
+// ISR：每 60 秒在后台重新生成一次，让浏览量数据不至于一直停在构建时
+// 用户访问永远拿缓存（毫秒级），后台静默刷新，体验/数据兼顾
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "博客",
   description: "工业互联网、AI 应用、全栈工程实践笔记。",

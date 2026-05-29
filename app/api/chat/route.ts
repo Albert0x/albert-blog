@@ -62,7 +62,7 @@ export async function POST(req: Request) {
 
   // ===== 防御层 3：IP 速率限制 - 每分钟/小时/天三级保护 =====
   const ip = getClientIp(req);
-  const limit = rateLimit(ip);
+  const limit = await rateLimit(ip);
   if (!limit.ok) {
     return Response.json(
       { error: "RATE_LIMITED", message: limit.reason },

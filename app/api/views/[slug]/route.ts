@@ -48,7 +48,7 @@ export async function POST(
 
   // 防线 2：速率限制
   const ip = getClientIp(req);
-  const limit = rateLimit(ip);
+  const limit = await rateLimit(ip);
   if (!limit.ok) {
     return Response.json(
       { error: "RATE_LIMITED", message: limit.reason },

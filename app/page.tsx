@@ -13,6 +13,10 @@ import { projects } from "@/lib/projects";
 // 老王说明：首页（Server Component）
 // 结构：3D Hero → 三大方向 → 最新文章 → 精选项目 → 行动召唤
 // Three.js 通过 Client Component + dynamic import 接入，零 SSR 包体污染
+//
+// ISR：每 60 秒后台静默重生成，让"最新文章"卡片浏览量保持新鲜
+export const revalidate = 60;
+
 const pillarIcons = { Factory, Sparkles, Code2 } as const;
 
 export default async function Home() {
