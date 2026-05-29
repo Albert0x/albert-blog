@@ -29,8 +29,12 @@ export interface Post extends PostMeta {
 // 内容目录
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
 
-// 老王说明：读取所有非草稿文章，按日期降序排序
-export function getAllPosts(): PostMeta[] {
+// 老王说明：读取文章列表，按日期降序排序
+// - 默认过滤草稿（用于公开博客列表）
+// - 后台管理传 { includeDrafts: true } 可以拿到全部（含草稿）
+export function getAllPosts(options: { includeDrafts?: boolean } = {}): PostMeta[] {
+  const { includeDrafts = false } = options;
+
   // 目录不存在直接返回空，避免崩
   if (!fs.existsSync(POSTS_DIR)) return [];
 
@@ -57,7 +61,7 @@ export function getAllPosts(): PostMeta[] {
         readingMinutes: Math.ceil(rt.minutes),
       } satisfies PostMeta;
     })
-    .filter((p) => !p.draft)
+    .filter((p) => includeDrafts || !p.draft)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 
   return posts;

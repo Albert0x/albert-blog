@@ -4,8 +4,19 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { Save, Trash2, ArrowLeft, Loader2, AlertCircle, ExternalLink } from "lucide-react";
+import {
+  Save,
+  Trash2,
+  ArrowLeft,
+  Loader2,
+  AlertCircle,
+  ExternalLink,
+  Pencil,
+  Eye,
+  Columns2,
+} from "lucide-react";
 import Link from "next/link";
+import { PostPreview } from "./PostPreview";
 
 // 老王说明：Monaco Editor 动态加载（不要 SSR，否则编辑器庞大的 JS 会拖慢首屏）
 const MonacoEditor = dynamic(
@@ -137,6 +148,8 @@ export function PostEditor({
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  // 老王说明：视图模式 - edit 仅编辑 / preview 仅预览 / split 分屏（桌面默认）
+  const [viewMode, setViewMode] = useState<"edit" | "preview" | "split">("split");
 
   // 老王说明：新建时自动从 title 生成 slug
   useEffect(() => {
@@ -231,6 +244,52 @@ export function PostEditor({
           返回列表
         </Link>
         <div className="flex items-center gap-2">
+          {/* 老王说明：视图模式三连按钮组 - 编辑/分屏/预览 */}
+          <div className="inline-flex items-center rounded-md border border-border/60 bg-card p-0.5">
+            <button
+              type="button"
+              onClick={() => setViewMode("edit")}
+              className={`inline-flex items-center gap-1 rounded px-2.5 py-1 text-xs transition-colors ${
+                viewMode === "edit"
+                  ? "bg-gradient-brand text-white shadow-sm"
+                  : "text-muted hover:text-foreground"
+              }`}
+              title="仅编辑"
+              aria-label="仅编辑"
+            >
+              <Pencil className="h-3 w-3" />
+              <span className="hidden sm:inline">编辑</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("split")}
+              className={`hidden md:inline-flex items-center gap-1 rounded px-2.5 py-1 text-xs transition-colors ${
+                viewMode === "split"
+                  ? "bg-gradient-brand text-white shadow-sm"
+                  : "text-muted hover:text-foreground"
+              }`}
+              title="分屏（编辑 + 预览）"
+              aria-label="分屏"
+            >
+              <Columns2 className="h-3 w-3" />
+              分屏
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("preview")}
+              className={`inline-flex items-center gap-1 rounded px-2.5 py-1 text-xs transition-colors ${
+                viewMode === "preview"
+                  ? "bg-gradient-brand text-white shadow-sm"
+                  : "text-muted hover:text-foreground"
+              }`}
+              title="仅预览"
+              aria-label="仅预览"
+            >
+              <Eye className="h-3 w-3" />
+              <span className="hidden sm:inline">预览</span>
+            </button>
+          </div>
+
           {isEdit && existingSlug && (
             <a
               href={`/blog/${existingSlug}`}
@@ -374,26 +433,45 @@ export function PostEditor({
         </div>
       </div>
 
-      {/* Monaco 编辑器 */}
-      <div className="flex-1 min-h-[400px] rounded-xl overflow-hidden border border-border/60">
-        <MonacoEditor
-          height="100%"
-          defaultLanguage="markdown"
-          language="markdown"
-          theme={resolvedTheme === "dark" ? "vs-dark" : "vs"}
-          value={body}
-          onChange={(v) => setBody(v ?? "")}
-          options={{
-            fontSize: 14,
-            minimap: { enabled: false },
-            wordWrap: "on",
-            lineNumbers: "on",
-            scrollBeyondLastLine: false,
-            padding: { top: 16, bottom: 16 },
-            fontFamily: "var(--font-geist-mono), monospace",
-            tabSize: 2,
-          }}
-        />
+      {/* 老王说明：正文区根据视图模式渲染
+          - edit:    仅编辑器（全宽）
+          - preview: 仅预览（全宽）
+          - split:   左编辑右预览（桌面端默认） */}
+      <div className="flex-1 min-h-[400px] grid gap-3 grid-cols-1 md:grid-cols-2">
+        {/* 编辑器：edit/split 模式显示 */}
+        {(viewMode === "edit" || viewMode === "split") && (
+          <div
+            className={`rounded-xl overflow-hidden border border-border/60 ${
+              viewMode === "edit" ? "md:col-span-2" : ""
+            }`}
+          >
+            <MonacoEditor
+              height="100%"
+              defaultLanguage="markdown"
+              language="markdown"
+              theme={resolvedTheme === "dark" ? "vs-dark" : "vs"}
+              value={body}
+              onChange={(v) => setBody(v ?? "")}
+              options={{
+                fontSize: 14,
+                minimap: { enabled: false },
+                wordWrap: "on",
+                lineNumbers: "on",
+                scrollBeyondLastLine: false,
+                padding: { top: 16, bottom: 16 },
+                fontFamily: "var(--font-geist-mono), monospace",
+                tabSize: 2,
+              }}
+            />
+          </div>
+        )}
+
+        {/* 预览：preview/split 模式显示 */}
+        {(viewMode === "preview" || viewMode === "split") && (
+          <div className={viewMode === "preview" ? "md:col-span-2" : ""}>
+            <PostPreview body={body} frontmatter={fm} />
+          </div>
+        )}
       </div>
 
       <p className="mt-2 text-[10px] text-muted/60 text-center">
