@@ -18,6 +18,7 @@
     "@octokit/rest": "^22.0.1",
     "@react-three/drei": "^9",
     "@react-three/fiber": "^8",
+    "@react-three/postprocessing": "^2.19.1",
     "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",

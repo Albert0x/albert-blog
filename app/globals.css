@@ -49,6 +49,37 @@ body {
     color: transparent;
   }
 
+  /* 流动渐变文字 - Hero 主标题专用，颜色持续左右流动 */
+  .text-gradient-flow {
+    background: linear-gradient(
+      90deg,
+      #6366f1,
+      #8b5cf6,
+      #06b6d4,
+      #ec4899,
+      #6366f1
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: gradient-flow 8s linear infinite;
+  }
+  @keyframes gradient-flow {
+    0% {
+      background-position: 0% 50%;
+    }
+    100% {
+      background-position: 300% 50%;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .text-gradient-flow {
+      animation: none;
+    }
+  }
+
   /* 毛玻璃容器 */
   .glass {
     background: rgba(255, 255, 255, 0.6);

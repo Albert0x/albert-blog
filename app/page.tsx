@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles, Factory, Code2 } from "lucide-react";
 import { Container } from "@/components/ui/Container";
+import { MagneticButton } from "@/components/ui/MagneticButton";
 import { HeroSceneClient } from "@/components/three/HeroSceneClient";
 import { AnimatedSection } from "@/components/home/AnimatedSection";
+import { AnimatedHeadline } from "@/components/home/AnimatedHeadline";
+import { CursorSpotlight } from "@/components/home/CursorSpotlight";
 import { PostCard } from "@/components/blog/PostCard";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { siteConfig } from "@/lib/site-config";
@@ -27,6 +30,9 @@ export default async function Home() {
 
   return (
     <>
+      {/* 鼠标聚光灯（跟随光标的柔光，触屏/减少动效自动关闭） */}
+      <CursorSpotlight />
+
       {/* ============== Hero 区（带 Three.js 3D 背景） ============== */}
       <section className="relative overflow-hidden min-h-[88vh] flex items-center">
         {/* 3D 背景 */}
@@ -43,10 +49,7 @@ export default async function Home() {
               工业互联网 × AI 应用 × 全栈工程
             </span>
 
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-balance leading-[1.05]">
-              你好，我是
-              <span className="text-gradient-brand"> {siteConfig.name} </span>
-            </h1>
+            <AnimatedHeadline prefix="你好，我是" name={siteConfig.name} />
 
             <p className="max-w-2xl text-lg md:text-xl text-muted text-balance leading-relaxed">
               把代码写进车间，把 <span className="text-foreground font-medium">AI</span> 带入工厂。
@@ -55,19 +58,20 @@ export default async function Home() {
             </p>
 
             <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-              <Link
+              <MagneticButton
                 href="/blog"
-                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-6 py-3 text-sm font-medium text-white shadow-lg shadow-brand/30 hover:shadow-xl hover:shadow-brand/40 hover:-translate-y-0.5 transition-all"
+                className="inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-brand px-6 py-3 text-sm font-medium text-white shadow-lg shadow-brand/30 hover:shadow-xl hover:shadow-brand/40 transition-shadow"
               >
                 浏览文章
                 <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
+              </MagneticButton>
+              <MagneticButton
                 href="/projects"
-                className="inline-flex items-center justify-center rounded-full border border-border/60 bg-card/60 px-6 py-3 text-sm font-medium hover:border-brand/60 hover:text-brand backdrop-blur-md transition-all"
+                strength={0.3}
+                className="inline-flex items-center justify-center rounded-full border border-border/60 bg-card/60 px-6 py-3 text-sm font-medium hover:border-brand/60 hover:text-brand backdrop-blur-md transition-colors"
               >
                 看看项目
-              </Link>
+              </MagneticButton>
               <Link
                 href="/about"
                 className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium text-muted hover:text-brand transition-all"
