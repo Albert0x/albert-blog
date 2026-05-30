@@ -25,8 +25,9 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 年（Cookie 有效期）
 // ===== GET：读取点赞数 + 是否已点 =====
 export async function GET(
   _req: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   // KV 未配置时静默降级（前端检测到 configured=false 会隐藏按钮）
   if (!isKvConfigured()) {
     return Response.json({
@@ -36,8 +37,8 @@ export async function GET(
     });
   }
 
-  const count = await getLikes(params.slug);
-  const voted = (await cookies()).has(VOTED_COOKIE(params.slug));
+  const count = await getLikes(slug);
+  const voted = (await cookies()).has(VOTED_COOKIE(slug));
 
   return Response.json({ count, voted, configured: true });
 }
@@ -45,8 +46,9 @@ export async function GET(
 // ===== POST：点赞 +1 =====
 export async function POST(
   req: Request,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   if (!isKvConfigured()) {
     return Response.json(
       { error: "NOT_CONFIGURED", message: "点赞系统未配置" },
@@ -79,10 +81,10 @@ export async function POST(
 
   // 防线 3：Cookie 去重
   const cookieStore = await cookies();
-  const cookieName = VOTED_COOKIE(params.slug);
+  const cookieName = VOTED_COOKIE(slug);
   if (cookieStore.has(cookieName)) {
     // 已点过 → 返回当前数 + voted=true（不真的 +1）
-    const count = await getLikes(params.slug);
+    const count = await getLikes(slug);
     return Response.json({
       count,
       voted: true,
@@ -92,7 +94,7 @@ export async function POST(
 
   // 全部通过 → 增加 + 设置 Cookie
   try {
-    const newCount = await incrementLikes(params.slug);
+    const newCount = await incrementLikes(slug);
     cookieStore.set(cookieName, "1", {
       maxAge: COOKIE_MAX_AGE,
       httpOnly: true,

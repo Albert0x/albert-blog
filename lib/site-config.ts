@@ -15,7 +15,6 @@ export const siteConfig = {
     // 想用本地图：把照片放到 public/avatar.png，改这里为 "/avatar.png"
     // 想用 SVG 占位：改回 "/avatar.svg"
     avatar: "https://github.com/Albert0x.png",
-    email: ".com", // TODO: 替换为真实邮箱
     github: "https://github.com/Albert0x", // Albert 的 GitHub 主页
   },
   // 顶部导航配置

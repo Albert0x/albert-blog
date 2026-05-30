@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Github, Mail } from "lucide-react";
+import { Github } from "lucide-react";
 import { siteConfig } from "@/lib/site-config";
 import { Container } from "@/components/ui/Container";
 
@@ -26,13 +26,6 @@ export function Footer() {
               aria-label="GitHub"
             >
               <Github className="h-4 w-4" />
-            </a>
-            <a
-              href={`mailto:${siteConfig.author.email}`}
-              className="grid h-9 w-9 place-items-center rounded-md text-muted hover:text-foreground hover:bg-foreground/5 transition-colors"
-              aria-label="Email"
-            >
-              <Mail className="h-4 w-4" />
             </a>
             <Link
               href="/feed.xml"
