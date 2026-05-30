@@ -15,7 +15,9 @@ export const revalidate = 60;
 type Props = { params: Promise<{ name: string }> };
 
 export async function generateStaticParams() {
-  return getAllCategories().map((name) => ({ name: encodeURIComponent(name) }));
+  // 返回原始分类名即可，Next.js 会自动对 URL 做编码。
+  // 不能在这里 encodeURIComponent，否则生产构建会双重编码导致点击 404。
+  return getAllCategories().map((name) => ({ name }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
