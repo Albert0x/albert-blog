@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { PostCard } from "@/components/blog/PostCard";
 import { getAllPosts, getAllCategories } from "@/lib/mdx";
@@ -62,16 +63,20 @@ export default async function BlogIndexPage() {
       {/* 分类 chip */}
       {categories.length > 0 && (
         <div className="mb-10 flex flex-wrap gap-2">
-          <span className="inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-xs font-medium text-white">
+          <Link
+            href="/blog"
+            className="inline-flex items-center rounded-full bg-gradient-brand px-3 py-1 text-xs font-medium text-white"
+          >
             全部 · {posts.length}
-          </span>
+          </Link>
           {categories.map((cat) => (
-            <span
+            <Link
               key={cat}
-              className="inline-flex items-center rounded-full border border-border/60 px-3 py-1 text-xs text-muted hover:border-brand/60 hover:text-brand transition-colors cursor-pointer"
+              href={`/blog/category/${encodeURIComponent(cat)}`}
+              className="inline-flex items-center rounded-full border border-border/60 px-3 py-1 text-xs text-muted hover:border-brand/60 hover:text-brand transition-colors"
             >
               {cat}
-            </span>
+            </Link>
           ))}
         </div>
       )}

@@ -100,6 +100,10 @@ export function getAllCategories(): string[] {
   return Array.from(set).sort();
 }
 
+export function getPostsByCategory(category: string) {
+  return getAllPosts().filter((p) => p.category === category);
+}
+
 // 取所有标签
 export function getAllTags(): string[] {
   const set = new Set<string>();
