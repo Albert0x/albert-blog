@@ -1,0 +1,245 @@
+---
+title: "把戴尔 7020 MT Plus 上的 Ubuntu Server 换成 PVE：我的安装记录"
+description: "i7-14700 + 128G + 5 口千兆的整机当家用虚拟化平台太浪费跑单系统，记录一遍把它装成 Proxmox VE 的全过程。"
+date: "2026-05-28"
+category: "随笔"
+tags: ["PVE", "Proxmox", "homelab", "虚拟化", "戴尔"]
+---
+
+## 起因
+
+最近入了一台戴尔 OptiPlex 7020 MT Plus，原厂预装 Ubuntu Server 22.04。
+但这配置跑单系统太浪费了：
+
+- **CPU**：Intel i7-14700（20 核 28 线程）
+- **内存**：128GB DDR5
+- **存储**：512GB SSD + 4TB HDD
+- **网卡**：5 口千兆（板载 1 + 扩展 4）
+- **显示器**：戴尔 E2425HM 23.8 寸
+
+想用它当家用 **homelab 虚拟化平台** ——
+跑几台 VM、一台软路由、一台 NAS、一个 AI 推理服务，还有富余。
+
+最直观的选择是 **PVE (Proxmox VE)**：
+开源免费、基于 Debian、Web 管理界面、原生支持 LXC 容器和 KVM 虚拟机。
+比 VMware ESXi 自由、比 KVM 命令行省心。
+
+这篇是我自己装一遍的记录，**主要是给下次重装的我自己看**。
+
+## 装机前的准备
+
+### 1. 数据备份
+
+虽然这台机器是新的，但既然 Ubuntu Server 上没什么重要东西，
+我直接覆盖装。**如果你机器上有数据，先备份再来读这篇。**
+
+PVE 安装会**格盘**，没有「保留分区」选项。
+
+### 2. 下载 PVE ISO
+
+去官网：https://www.proxmox.com/en/downloads
+
+选最新稳定版（我用的 **8.x**）。
+ISO 大小 ~1.3GB，国内下载慢，用清华镜像更快：
+
+```
+https://mirrors.tuna.tsinghua.edu.cn/proxmox/iso/
+```
+
+### 3. 做启动 U 盘
+
+8GB+ U 盘一个。推荐 **Ventoy**：
+- 把 Ventoy 装到 U 盘（一次性，以后这 U 盘可以放多个 ISO）
+- 把 PVE 的 ISO 直接拷到 U 盘
+- 开机选 U 盘启动 → Ventoy 菜单 → 选 PVE ISO
+
+⚠️ 不要用 Rufus 写 PVE ISO，**经常报「无法引导」**——PVE 用的是混合 ISO，
+Rufus 的某些写入模式会破坏它。Ventoy 没这问题。
+
+## 戴尔 7020 MT Plus 的 BIOS 设置
+
+开机按 **F2** 进 BIOS（按 F12 是临时启动菜单）。
+
+要检查 / 修改的几项：
+
+| 位置 | 改成 |
+|---|---|
+| Advanced → Virtualization → Intel VT-x | **Enabled**（默认开）|
+| Advanced → Virtualization → Intel VT-d | **Enabled**（**手动开**，后续做硬件直通要用）|
+| Advanced → Secure Boot | **Disabled**（PVE 不支持安全启动）|
+| Advanced → Boot Sequence | 把 USB 调到最前 |
+
+保存退出。
+
+> 14 代 CPU 的 VT-x 默认是开的，但 VT-d 经常默认关。
+> 我装的时候没想到要 VT-d，**后来给 AI 服务做 GPU 直通才补开**，又重启一次。
+> 一次开好省事。
+
+## 安装 PVE
+
+插 U 盘开机，按 F12 → 选 U 盘 → Ventoy 菜单 → 选 PVE ISO →
+进入 PVE 安装向导。
+
+### Step 1: 同意 EULA
+
+直接 `I agree`。
+
+### Step 2: 选目标磁盘
+
+会列出所有硬盘。我这里有两块：
+
+- `nvme0n1` 512GB（SSD）→ **装系统**
+- `sda` 4TB（HDD）→ 暂时不动，进系统后再加进存储池
+
+**选 SSD 那块**，文件系统选 **ext4**（默认）。
+
+> 也可以选 **ZFS（RAID0 单盘）**，能用 ZFS 的快照 / 压缩特性。
+> 但 ZFS 吃内存（建议至少 1GB / 1TB 数据）。
+> 我对 ZFS 还不够熟，先选 ext4，稳妥。
+
+### Step 3: 地理位置
+
+- Country: `China`
+- Timezone: `Asia/Shanghai`
+- Keyboard: `U.S. English`
+
+### Step 4: 设置 root 密码 + 邮箱
+
+- Password: 自己定一个，记好
+- Email: 写一个能收信的（PVE 会发系统通知到这里）
+
+### Step 5: 网络配置
+
+- Management Interface: 选一个网口（先随便选第一个 `eno1`）
+- Hostname: `pve.lan`（或你想的名字 + 域名后缀）
+- IP Address: 给一个静态 IP（比如 `192.168.1.10/24`）
+- Gateway: 你的路由器（`192.168.1.1`）
+- DNS Server: `223.5.5.5`（阿里 DNS）或 `192.168.1.1`
+
+⚠️ **IP 一定要静态**。PVE 的 Web 控制台靠 IP 访问，
+DHCP 给的 IP 换一次你就找不到了。
+
+### Step 6: 确认 + 安装
+
+点 `Install`，等 5-10 分钟。
+装完会提示 `Reboot`，**先拔 U 盘**再点。
+
+重启后控制台显示：
+
+```
+Welcome to Proxmox VE!
+
+Please use your browser to visit:
+
+  https://192.168.1.10:8006/
+```
+
+成功 ✅
+
+## 装完进系统的第一件事
+
+在另一台电脑浏览器打开 `https://192.168.1.10:8006`。
+浏览器会警告自签名证书 → 选「继续访问」。
+
+用户名 `root`，密码刚才设的，登录方式选 `Linux PAM`。
+
+### 1. 关掉「无订阅」弹窗
+
+PVE 每次登录会弹一个「未购买订阅」提示框，烦。
+SSH 登录进去执行（一行命令，社区流传的标准操作）：
+
+```bash
+sed -i.bak "s/data.status === 'Active'/true/g" \
+  /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+systemctl restart pveproxy
+```
+
+刷新浏览器，弹窗就没了。
+（PVE 升级后这行可能会被覆盖，下次升级再执行一遍。）
+
+### 2. 换 apt 源到国内镜像
+
+默认源在国外，更新慢。
+我用清华镜像：
+
+```bash
+# 主源
+sed -i 's|http://ftp.debian.org|https://mirrors.tuna.tsinghua.edu.cn|g' \
+  /etc/apt/sources.list
+sed -i 's|http://security.debian.org|https://mirrors.tuna.tsinghua.edu.cn/debian-security|g' \
+  /etc/apt/sources.list
+
+# 删掉企业源（个人用不到，不删 apt update 会一直报错）
+rm /etc/apt/sources.list.d/pve-enterprise.list
+
+# 加 no-subscription 源（清华镜像）
+echo "deb https://mirrors.tuna.tsinghua.edu.cn/proxmox/debian/pve bookworm pve-no-subscription" \
+  > /etc/apt/sources.list.d/pve-no-subscription.list
+
+apt update
+apt -y dist-upgrade
+```
+
+### 3. SSH 公钥免密
+
+每次输 root 密码很烦。把本地公钥扔上去：
+
+```bash
+# 本地（不是 PVE 上）
+ssh-copy-id root@192.168.1.10
+```
+
+以后 `ssh root@192.168.1.10` 直接进。
+
+## 4TB 机械盘怎么挂
+
+PVE Web 界面 → `Datacenter → pve → Disks` → 能看到那块 4TB 的 `sda`，
+状态是 `No`（没用上）。
+
+打算把它做成**目录存储**给 VM 备份 + ISO 用：
+
+```bash
+# SSH 到 PVE
+parted /dev/sda mklabel gpt
+parted /dev/sda mkpart primary ext4 0% 100%
+mkfs.ext4 /dev/sda1
+mkdir /mnt/hdd
+echo "/dev/sda1 /mnt/hdd ext4 defaults 0 2" >> /etc/fstab
+mount -a
+```
+
+然后 Web 界面 → `Datacenter → Storage → Add → Directory`：
+- ID: `hdd`
+- Directory: `/mnt/hdd`
+- Content: 勾选 `VZDump backup file`、`ISO image`、`Container template`
+
+完成。SSD 留给 VM 系统盘（性能），HDD 当备份仓 + 媒体存储（容量）。
+
+## 5 口千兆网卡的规划
+
+`ip addr` 看一下所有网口（应该有 5 个，名字类似 `eno1` / `enp2s0..enp5s0`）。
+
+我打算这么用：
+
+| 网口 | 用途 |
+|---|---|
+| `eno1`（板载）| PVE 管理 + 家庭网段 `vmbr0` |
+| `enp2s0` | 软路由 WAN（虚拟机直通）|
+| `enp3s0` | 软路由 LAN1 |
+| `enp4s0` | 软路由 LAN2 |
+| `enp5s0` | 预留 / 直通给某台 VM 当独立网口 |
+
+具体怎么做软路由 VM、怎么把网口直通给 VM，**还没动手**，下次单独写。
+
+## 还没搞懂 / 后续要研究的
+
+- ZFS vs ext4 在 PVE 上的真实差异（快照 / 压缩 / 内存代价）
+- GPU 直通给 VM（我这机器没独显，但 i7-14700 的核显能不能直通给 Jellyfin 转码？）
+- LXC 容器 vs KVM 全虚拟机的选择场景
+- 怎么做定时备份到外部 NAS
+
+## 参考
+
+- PVE 官方文档：https://pve.proxmox.com/wiki/Main_Page
+- 清华 PVE 镜像：https://mirrors.tuna.tsinghua.edu.cn/help/proxmox/
+- Ventoy：https://www.ventoy.net/
